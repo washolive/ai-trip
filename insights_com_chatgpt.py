@@ -23,7 +23,7 @@ from urllib.request import urlopen, quote
 from zipfile import ZipFile
 from io import BytesIO
 import pandas as pd
-import plotly.express as px
+# import plotly.express as px
 import streamlit as st
 import openai
 
@@ -97,9 +97,9 @@ def create_dashboard(df: pd.DataFrame) -> pd.DataFrame:
     ind4.metric(label="Soma", value=valor)
 
     st.markdown("### Série temporal")
-    fig = px.bar(data_frame=df, y="valor", x="ano_mes_referencia")
-    fig.update_layout(xaxis_type='category')
-    st.write(fig)
+    df_group = df.groupby(["ano_mes_referencia"],
+                          as_index=False)["valor"].agg({"total": "sum"})
+    st.bar_chart(data=df_group, x="ano_mes_referencia", y="total")
 
     st.markdown("### Dados detalhados")
     st.dataframe(df)
@@ -149,4 +149,7 @@ st.session_state["data_loaded"] = True
 
 if st.session_state["data_loaded"]:
     df_filtered = create_dashboard(df_full)
-    get_insights(df_filtered)
+
+    insights = st.button("Gerar insights")
+    if insights:
+        get_insights(df_filtered)
