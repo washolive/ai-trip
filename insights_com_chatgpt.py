@@ -109,11 +109,10 @@ def create_dashboard(df: pd.DataFrame) -> pd.DataFrame:
 def get_insights(df: pd.DataFrame):
     """Chama o ChatGPT para obter insights sobre os dados"""
 
-    st.markdown("### Insights do ChatGPT")
-
     openai.api_key = os.environ.get("OPENAI_API_KEY")
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
+        temperature=0.2,
         messages=[
             {"role": "user",
                 "content": f"""O dataset a seguir contém dados do
@@ -121,17 +120,6 @@ def get_insights(df: pd.DataFrame):
                 Informe 10 insights sobre este dataset: {df}"""
             },
         ]
-    )
-    st.markdown(completion.choices[0].message.content)
-
-    completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "user",
-            "content": f"""Explique o porquê dos valores negativos.
-            Quais depesas possuem mais valores negativos neste dataset? {df}"""
-            },
-    ]
     )
     st.markdown(completion.choices[0].message.content)
 
