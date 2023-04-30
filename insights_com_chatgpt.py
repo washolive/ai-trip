@@ -6,8 +6,9 @@ compreendem gastos correntes relativos a apoio administrativo,
 energia elétrica, água, telefone, locação de imóveis, entre outros.
 
 Requisitos:
-    - python 3.7.1+
-    - openai 0.27.0+
+    - python >= 3.7
+    - openai >= 0.27
+    - streamlit >= 1.21
     - Variável OPENAI_API_KEY (API Key do ChatGPT) setada no ambiente.
 
 Para executar:
@@ -29,6 +30,7 @@ import openai
 locale.setlocale(locale.LC_ALL, 'pt_BR')
 
 
+@st.cache_data
 def load_data(year: int) -> pd.DataFrame:
     """Lê os arquivos de dados abertos e carrega em um dataframe"""
 
@@ -39,7 +41,7 @@ def load_data(year: int) -> pd.DataFrame:
     df_list = []
     for ref in range(12):
         file_name = f"{FILE_PREFIX}-{year}-{(ref + 1):02d}.zip"
-        file_url = REPO_URL + quote(file_name) # file_name
+        file_url = REPO_URL + quote(file_name)
         url = urlopen(file_url)
         file = ZipFile(BytesIO(url.read()))
         df_month = pd.read_csv(file.open(CSV_FILE))
@@ -139,6 +141,12 @@ st.title("Custeio Administrativo")
 st.write(f"""Despesas necessárias para o funcionamento da administração
             pública federal no ano de {ANO_ANALISE}.""")
 
+if "data_loaded" not in st.session_state:
+    st.session_state["data_loaded"] = False
+
 df_full = load_data(ANO_ANALISE)
-df_filtered = create_dashboard(df_full)
-get_insights(df_filtered)
+st.session_state["data_loaded"] = True
+
+if st.session_state["data_loaded"]:
+    df_filtered = create_dashboard(df_full)
+    get_insights(df_filtered)
