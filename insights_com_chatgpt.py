@@ -56,6 +56,7 @@ def load_data(year: int) -> pd.DataFrame:
     df.rename({"nome_item": "item_despesa",
             "nome_natureza_despesa_detalhada": "natureza_despesa"},
             axis=1, inplace=True)
+    df = df[df["valor"] != 0]
     return df
 
 
